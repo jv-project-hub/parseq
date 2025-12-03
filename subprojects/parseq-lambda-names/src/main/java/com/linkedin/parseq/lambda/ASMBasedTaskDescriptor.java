@@ -80,71 +80,109 @@ public class ASMBasedTaskDescriptor implements TaskDescriptor {
     }
   }
 
+  private static final boolean INSTRUMENTATION_ENABLED;
+
   static {
+    boolean instrumentationEnabled = false;
 
-    try {
-      Instrumentation inst = ByteBuddyAgent.install();
-
-      /*
-       * If we can get the instance of jdk.internal.misc.Unsafe then we will
-       * attempt to instrument Unsafe.defineAnonymousClass(...) to capture classes
-       * generated for lambdas.
-       * This approach does not work for Oracle Java 8 because
-       * sun.misc.Unsafe.defineAnonymousClass(...) is a native method and we can
-       * at most replace it but there is no reasonably easy way to replace it and
-       * still invoke the original method.
-       */
-      boolean isJdkUnsafe = false;
-      Class<?> unsafe = null;
+    // Check Java version - defineAnonymousClass was removed in Java 15
+    int javaVersion = getJavaVersion();
+    if (javaVersion >= 15) {
+      // Java 15+ does not support Unsafe.defineAnonymousClass instrumentation
+      // Lambda names will fall back to simple class names
+      System.out.println("INFO: ParSeq lambda-names instrumentation disabled on Java " + javaVersion +
+          " (defineAnonymousClass removed in Java 15). Lambda descriptions will use simple class names.");
+    } else {
       try {
-        unsafe = Class.forName("jdk.internal.misc.Unsafe");
-        isJdkUnsafe = true;
-      } catch (ClassNotFoundException e) {
-      }
-
-      if (isJdkUnsafe) {
-        // Code path that supports OpenJDK Java 11 and up
+        Instrumentation inst = ByteBuddyAgent.install();
 
         /*
-         * Inject AnalyzerAdvice to boot ClassLoader.
-         * It has to be reachable from jdk.internal.misc.Unsafe.
+         * If we can get the instance of jdk.internal.misc.Unsafe then we will
+         * attempt to instrument Unsafe.defineAnonymousClass(...) to capture classes
+         * generated for lambdas.
+         * This approach does not work for Oracle Java 8 because
+         * sun.misc.Unsafe.defineAnonymousClass(...) is a native method and we can
+         * at most replace it but there is no reasonably easy way to replace it and
+         * still invoke the original method.
          */
-        ClassInjector.UsingUnsafe.ofBootLoader()
-            .inject(Collections.singletonMap(new TypeDescription.ForLoadedType(AnalyzerAdvice.class),
-                ClassFileLocator.ForClassLoader.read(AnalyzerAdvice.class)));
+        boolean isJdkUnsafe = false;
+        Class<?> unsafe = null;
+        try {
+          unsafe = Class.forName("jdk.internal.misc.Unsafe");
+          isJdkUnsafe = true;
+        } catch (ClassNotFoundException e) {
+        }
 
-        /*
-         * Inject the analyze(byte[] byteCode, ClassLoader loader) method from this ClassLoader
-         * to the AnalyzerAdvice class from boot ClassLoader.
-         */
-        Class<?> injectedInt = ClassLoader.getSystemClassLoader().getParent().loadClass(AnalyzerAdvice.class.getName());
-        injectedInt.getField("_method")
-            .set(null, Analyzer.class.getDeclaredMethod("analyze", byte[].class, ClassLoader.class));
+        if (isJdkUnsafe) {
+          // Code path that supports OpenJDK Java 11-14
 
-        JavaModule module = JavaModule.ofType(injectedInt);
+          /*
+           * Inject AnalyzerAdvice to boot ClassLoader.
+           * It has to be reachable from jdk.internal.misc.Unsafe.
+           */
+          ClassInjector.UsingUnsafe.ofBootLoader()
+              .inject(Collections.singletonMap(new TypeDescription.ForLoadedType(AnalyzerAdvice.class),
+                  ClassFileLocator.ForClassLoader.read(AnalyzerAdvice.class)));
 
-        new AgentBuilder.Default().disableClassFormatChanges()
-            .ignore(noneOf(unsafe))
-            .with(AgentBuilder.InitializationStrategy.NoOp.INSTANCE)
-            .with(AgentBuilder.RedefinitionStrategy.REDEFINITION)
-            .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
-            .with(AgentBuilder.InjectionStrategy.UsingUnsafe.INSTANCE)
-            .assureReadEdgeTo(inst, module)
-            .type(is(unsafe))
-            .transform(new AgentBuilder.Transformer() {
-              @Override
-              public Builder<?> transform(Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader,
-                  JavaModule module, ProtectionDomain protectionDomain) {
-                return builder.visit(Advice.to(AnalyzerAdvice.class).on(ElementMatchers.named("defineAnonymousClass")));
-              }
-            })
-            .installOnByteBuddyAgent();
-      } else {
-        // Code path that supports Oracle Java 8 and 9
-        inst.addTransformer(new Analyzer());
+          /*
+           * Inject the analyze(byte[] byteCode, ClassLoader loader) method from this ClassLoader
+           * to the AnalyzerAdvice class from boot ClassLoader.
+           */
+          Class<?> injectedInt = ClassLoader.getSystemClassLoader().getParent().loadClass(AnalyzerAdvice.class.getName());
+          injectedInt.getField("_method")
+              .set(null, Analyzer.class.getDeclaredMethod("analyze", byte[].class, ClassLoader.class));
+
+          JavaModule module = JavaModule.ofType(injectedInt);
+
+          new AgentBuilder.Default().disableClassFormatChanges()
+              .ignore(noneOf(unsafe))
+              .with(AgentBuilder.InitializationStrategy.NoOp.INSTANCE)
+              .with(AgentBuilder.RedefinitionStrategy.REDEFINITION)
+              .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
+              .with(AgentBuilder.InjectionStrategy.UsingUnsafe.INSTANCE)
+              .assureReadEdgeTo(inst, module)
+              .type(is(unsafe))
+              .transform(new AgentBuilder.Transformer() {
+                @Override
+                public Builder<?> transform(Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader,
+                    JavaModule module, ProtectionDomain protectionDomain) {
+                  return builder.visit(Advice.to(AnalyzerAdvice.class).on(ElementMatchers.named("defineAnonymousClass")));
+                }
+              })
+              .installOnByteBuddyAgent();
+          instrumentationEnabled = true;
+        } else {
+          // Code path that supports Oracle Java 8 and 9
+          inst.addTransformer(new Analyzer());
+          instrumentationEnabled = true;
+        }
+      } catch (Exception e) {
+        System.out.println("WARNING: ParSeq lambda-names instrumentation failed to initialize. " +
+            "Lambda descriptions will use simple class names.");
+        e.printStackTrace();
       }
-    } catch (Exception e) {
-      e.printStackTrace();
+    }
+
+    INSTRUMENTATION_ENABLED = instrumentationEnabled;
+  }
+
+  private static int getJavaVersion() {
+    String version = System.getProperty("java.version");
+    if (version.startsWith("1.")) {
+      // Java 8 or earlier: 1.8.0_xxx
+      return Integer.parseInt(version.substring(2, 3));
+    } else {
+      // Java 9+: 9.0.x, 10.0.x, 11.0.x, etc.
+      int dotIndex = version.indexOf(".");
+      if (dotIndex > 0) {
+        return Integer.parseInt(version.substring(0, dotIndex));
+      }
+      // Handle versions like "21" without dots
+      int dashIndex = version.indexOf("-");
+      if (dashIndex > 0) {
+        return Integer.parseInt(version.substring(0, dashIndex));
+      }
+      return Integer.parseInt(version);
     }
   }
 

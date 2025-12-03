@@ -13,6 +13,35 @@ import static org.testng.Assert.assertTrue;
 
 class BaseTest {
 
+  /**
+   * Check if we're running on Java 15+ where lambda instrumentation is disabled.
+   * On Java 15+, Unsafe.defineAnonymousClass was removed, so we can't instrument lambdas.
+   */
+  static boolean isInstrumentationDisabled() {
+    int javaVersion = getJavaVersion();
+    return javaVersion >= 15;
+  }
+
+  private static int getJavaVersion() {
+    String version = System.getProperty("java.version");
+    if (version.startsWith("1.")) {
+      // Java 8 or earlier: 1.8.0_xxx
+      return Integer.parseInt(version.substring(2, 3));
+    } else {
+      // Java 9+: 9.0.x, 10.0.x, 11.0.x, etc.
+      int dotIndex = version.indexOf(".");
+      if (dotIndex > 0) {
+        return Integer.parseInt(version.substring(0, dotIndex));
+      }
+      // Handle versions like "21" without dots
+      int dashIndex = version.indexOf("-");
+      if (dashIndex > 0) {
+        return Integer.parseInt(version.substring(0, dashIndex));
+      }
+      return Integer.parseInt(version);
+    }
+  }
+
   static String staticFunction(String s) {
     return s;
   }
@@ -86,8 +115,46 @@ class BaseTest {
     return _asmBasedTaskDescriptor.getLambdaClassDescription(c.getClass().getName());
   }
 
+  /**
+   * Helper method that handles both the presence check and assertion.
+   * On Java 15+, instrumentation is disabled, so we skip the detailed assertions.
+   */
+  void assertDescriptionMatches(Optional<String> description, String inferredFunction,
+                                String callerMethodName, String callerClassName) {
+    if (isInstrumentationDisabled()) {
+      // On Java 15+, instrumentation is disabled, so description will be empty
+      // This is expected behavior - just return without failing
+      return;
+    }
+    assertTrue(description.isPresent(), "Expected description to be present");
+    assertNameMatch(inferredFunction, callerMethodName, callerClassName, description.get());
+  }
+
+  /**
+   * Helper method that handles both the presence check and assertion with line number.
+   * On Java 15+, instrumentation is disabled, so we skip the detailed assertions.
+   */
+  void assertDescriptionMatches(Optional<String> description, String inferredFunction,
+                                String callerMethodName, String callerClassName, int lineNumber) {
+    if (isInstrumentationDisabled()) {
+      // On Java 15+, instrumentation is disabled, so description will be empty
+      // This is expected behavior - just return without failing
+      return;
+    }
+    assertTrue(description.isPresent(), "Expected description to be present");
+    assertNameMatch(inferredFunction, callerMethodName, callerClassName, lineNumber, description.get());
+  }
+
   void assertNameMatch(String inferredFunction, String callerMethodName, String callerClassName,
                                   String lambdaClassDescription) {
+    // On Java 15+, instrumentation is disabled, so we can't verify detailed lambda descriptions
+    if (isInstrumentationDisabled()) {
+      // Just verify we got some description (even if it's the simple class name)
+      assertTrue(lambdaClassDescription != null && !lambdaClassDescription.isEmpty(),
+          "Expected non-empty description on Java 15+");
+      return;
+    }
+
     if (inferredFunction.isEmpty()) {
       if (callerMethodName.isEmpty()) {
         Pattern p = Pattern.compile(callerClassName + ":\\d+");
@@ -108,6 +175,14 @@ class BaseTest {
 
   void assertNameMatch(String inferredFunction, String callerMethodName, String callerClassName, int lineNumber,
       String lambdaClassDescription) {
+    // On Java 15+, instrumentation is disabled, so we can't verify detailed lambda descriptions
+    if (isInstrumentationDisabled()) {
+      // Just verify we got some description (even if it's the simple class name)
+      assertTrue(lambdaClassDescription != null && !lambdaClassDescription.isEmpty(),
+          "Expected non-empty description on Java 15+");
+      return;
+    }
+
     if (inferredFunction.isEmpty()) {
       assertTrue(lambdaClassDescription.equalsIgnoreCase(callerMethodName + "(" + callerClassName + ":" + lineNumber + ")"));
     } else {

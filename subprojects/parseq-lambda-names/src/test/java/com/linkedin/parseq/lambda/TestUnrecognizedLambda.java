@@ -27,15 +27,15 @@ public class TestUnrecognizedLambda extends BaseTest {
   @Test
   public void testReturnExpression() {
     Optional<String> description = getDescriptionForCallable(() -> {return "";});
-    assertTrue(description.isPresent());
-    assertNameMatch("", "testReturnExpression", CLASSNAME, description.get());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("", "testReturnExpression", CLASSNAME, description.get());
   }
 
   @Test
   public void testReturnIntegerExpression() {
     Optional<String> description = getDescriptionForCallableInteger(() -> 0);
-    assertTrue(description.isPresent());
-    assertNameMatch("", "testReturnIntegerExpression", CLASSNAME, description.get());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("", "testReturnIntegerExpression", CLASSNAME, description.get());
   }
 
   @Test
@@ -46,16 +46,16 @@ public class TestUnrecognizedLambda extends BaseTest {
       int c = a + b;
       return null;
     });
-    assertTrue(description.isPresent());
-    assertNameMatch("", "testExpressions", CLASSNAME, description.get());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("", "testExpressions", CLASSNAME, description.get());
   }
 
   @Test
   public void testOperations() {
     MathOperation multiplication = (int a, int b) -> { return a * b; };
     Optional<String> description = getDescriptionForIntCallable(() -> {return this.operate(5, 3, multiplication);});;
-    assertTrue(description.isPresent());
-    assertNameMatch("operate(_,_,_)", "testOperations", CLASSNAME, description.get());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("operate(_,_,_)", "testOperations", CLASSNAME, description.get());
   }
 
   @Test
@@ -69,16 +69,16 @@ public class TestUnrecognizedLambda extends BaseTest {
 //        .forEach(System.out::println);
 
     Optional<String> predicateDescription = getDescriptionForStringPredicate(p -> p.startsWith("c"));
-    assertTrue(predicateDescription.isPresent());
-    assertNameMatch("startsWith(_)", "testStream", CLASSNAME, predicateDescription.get());
+    if (!isInstrumentationDisabled()) assertTrue(predicateDescription.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("startsWith(_)", "testStream", CLASSNAME, predicateDescription.get());
 
     Optional<String> mapDescription = getDescriptionForFunction(s -> s.toUpperCase());
-    assertTrue(mapDescription.isPresent());
-    assertNameMatch("toUpperCase()", "testStream", CLASSNAME, mapDescription.get());
+    if (!isInstrumentationDisabled()) assertTrue(mapDescription.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("toUpperCase()", "testStream", CLASSNAME, mapDescription.get());
 
     Optional<String> foreachDescription = getDescriptionForConsumer(System.out::println);
-    assertTrue(foreachDescription.isPresent());
-    assertNameMatch("::println", "testStream", CLASSNAME, foreachDescription.get());
+    if (!isInstrumentationDisabled()) assertTrue(foreachDescription.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("::println", "testStream", CLASSNAME, foreachDescription.get());
   }
 
   interface MathOperation {
@@ -94,8 +94,8 @@ public class TestUnrecognizedLambda extends BaseTest {
     Optional<String> codeBlockDescription = getDescriptionForFunction(str -> {
       return (str.length() > 0) ? str.trim() : str;
     });
-    assertTrue(codeBlockDescription.isPresent());
-    assertNameMatch("", "testBlockOfCodeInInvocation", CLASSNAME, codeBlockDescription.get());
+    if (!isInstrumentationDisabled()) assertTrue(codeBlockDescription.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("", "testBlockOfCodeInInvocation", CLASSNAME, codeBlockDescription.get());
   }
 
   @Test
@@ -104,8 +104,8 @@ public class TestUnrecognizedLambda extends BaseTest {
         paramMethod(Long.MAX_VALUE, "")
             .callable()
     );
-    assertTrue(description.isPresent());
-    assertNameMatch("callable()", "testParamMethodCallableMultipleLineCode", CLASSNAME, description.get());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("callable()", "testParamMethodCallableMultipleLineCode", CLASSNAME, description.get());
   }
 
   @Test
@@ -113,8 +113,8 @@ public class TestUnrecognizedLambda extends BaseTest {
     Optional<String> description = getDescriptionForCallable(() ->
         "hello".toUpperCase() + " " + System.getProperty("user.name")
     );
-    assertTrue(description.isPresent());
-    assertNameMatch("", "testStringConcatenationWithMethodCalls", CLASSNAME, description.get());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("", "testStringConcatenationWithMethodCalls", CLASSNAME, description.get());
   }
 
   @Test
@@ -122,16 +122,16 @@ public class TestUnrecognizedLambda extends BaseTest {
     Optional<String> description = getDescriptionForCallable(() ->
         "hello" + " " + "world"
     );
-    assertTrue(description.isPresent());
-    assertNameMatch("", "testStringConcatenation", CLASSNAME, description.get());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("", "testStringConcatenation", CLASSNAME, description.get());
   }
 
   @Test
   public void testNestedCallbackLambdas() throws Exception {
     Callable<Optional<String>> descriptionProvider = () -> getDescriptionForCallable(() -> "hello");
     Optional<String> description = descriptionProvider.call();
-    assertTrue(description.isPresent());
-    assertNameMatch("", "testNestedCallbackLambdas", CLASSNAME, description.get());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("", "testNestedCallbackLambdas", CLASSNAME, description.get());
   }
 
   private class Nest implements Callable<Optional<String>> {
@@ -151,8 +151,8 @@ public class TestUnrecognizedLambda extends BaseTest {
         return getDescriptionForCallable(() -> "hello");
     });
     Optional<String> description = c.call();
-    assertTrue(description.isPresent());
-    assertNameMatch("", "", CLASSNAME, description.get());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("", "", CLASSNAME, description.get());
   }
 
 }

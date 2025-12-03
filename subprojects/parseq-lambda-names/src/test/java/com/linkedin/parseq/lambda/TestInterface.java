@@ -46,46 +46,46 @@ public class TestInterface extends BaseTest {
   public void testFunctionReferenceOnInterface() {
     SampleImplementation impl = new SampleImplementation();
     Optional<String> description = getDescriptionForFunction(impl::interfaceFunction);
-    assertTrue(description.isPresent());
-    assertNameMatch("::interfaceFunction", "testFunctionReferenceOnInterface", CLASSNAME, description.get().toString());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("::interfaceFunction", "testFunctionReferenceOnInterface", CLASSNAME, description.get().toString());
   }
 
   @Test
   public void testStaticFunctionReferenceOnInterface() {
     Optional<String> description = getDescriptionForFunction(SampleInterface::staticFunction);
-    assertTrue(description.isPresent());
-    assertNameMatch("TestInterface$SampleInterface::staticFunction", "testStaticFunctionReferenceOnInterface", CLASSNAME, description.get().toString());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("TestInterface$SampleInterface::staticFunction", "testStaticFunctionReferenceOnInterface", CLASSNAME, description.get().toString());
   }
 
   @Test
   public void testAbstractFunctionReferenceOnInterface() {
     SampleImplementation impl = new SampleImplementation();
     Optional<String> description = getDescriptionForFunction(impl::abstractFunction);
-    assertTrue(description.isPresent());
-    assertNameMatch("::abstractFunction", "testAbstractFunctionReferenceOnInterface", CLASSNAME, description.get().toString());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("::abstractFunction", "testAbstractFunctionReferenceOnInterface", CLASSNAME, description.get().toString());
   }
 
   @Test
   public void testFunctionInvocationOnInterface() {
     SampleImplementation impl = new SampleImplementation();
     Optional<String> description = getDescriptionForFunction(s -> impl.interfaceFunction(s));
-    assertTrue(description.isPresent());
-    assertNameMatch("interfaceFunction(_)", "testFunctionInvocationOnInterface", CLASSNAME, description.get().toString());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("interfaceFunction(_)", "testFunctionInvocationOnInterface", CLASSNAME, description.get().toString());
   }
 
   @Test
   public void testStaticFunctionInvocationOnInterface() {
     Optional<String> description = getDescriptionForFunction(s -> SampleInterface.staticFunction(s));
-    assertTrue(description.isPresent());
-    assertNameMatch("TestInterface$SampleInterface.staticFunction(_)", "testStaticFunctionInvocationOnInterface", CLASSNAME, description.get().toString());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("TestInterface$SampleInterface.staticFunction(_)", "testStaticFunctionInvocationOnInterface", CLASSNAME, description.get().toString());
   }
 
   @Test
   public void testAbstractFunctionInvocationOnInterface() {
     SampleImplementation impl = new SampleImplementation();
     Optional<String> description = getDescriptionForFunction(s -> impl.abstractFunction(s));
-    assertTrue(description.isPresent());
-    assertNameMatch("abstractFunction(_)", "testAbstractFunctionInvocationOnInterface", CLASSNAME,
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("abstractFunction(_)", "testAbstractFunctionInvocationOnInterface", CLASSNAME,
         description.get().toString());
   }
 }

@@ -13,15 +13,15 @@ public class TestStaticMethodInv extends BaseTest {
   @Test
   public void testStaticFunction() {
     Optional<String> description = getDescriptionForFunction(s -> BaseTest.staticFunction(s));
-    assertTrue(description.isPresent());
-    assertNameMatch("BaseTest.staticFunction(_)", "testStaticFunction", CLASSNAME, 15, description.get().toString());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("BaseTest.staticFunction(_)", "testStaticFunction", CLASSNAME, 15, description.get().toString());
   }
 
   @Test
   public void testStaticCallable() {
     Optional<String> description = getDescriptionForCallable(() -> BaseTest.staticCallable());
-    assertTrue(description.isPresent());
-    assertNameMatch("BaseTest.staticCallable()", "testStaticCallable", CLASSNAME, 22, description.get().toString());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("BaseTest.staticCallable()", "testStaticCallable", CLASSNAME, 22, description.get().toString());
   }
 
   @Test
@@ -29,7 +29,7 @@ public class TestStaticMethodInv extends BaseTest {
     Optional<String> description = getDescriptionForConsumer(s
         ->
         BaseTest.staticConsumer(s));
-    assertTrue(description.isPresent());
-    assertNameMatch("BaseTest.staticConsumer(_)", "testStaticConsumer", CLASSNAME, 31, description.get().toString());
+    if (!isInstrumentationDisabled()) assertTrue(description.isPresent());
+    if (!isInstrumentationDisabled()) assertNameMatch("BaseTest.staticConsumer(_)", "testStaticConsumer", CLASSNAME, 31, description.get().toString());
   }
 }
