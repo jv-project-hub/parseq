@@ -19,7 +19,7 @@ package com.linkedin.parseq.trace.codec.json;
 import java.io.IOException;
 import java.util.Map;
 
-import org.codehaus.jackson.JsonGenerator;
+import com.fasterxml.jackson.core.JsonGenerator;
 
 import com.linkedin.parseq.trace.ShallowTrace;
 import com.linkedin.parseq.trace.Trace;

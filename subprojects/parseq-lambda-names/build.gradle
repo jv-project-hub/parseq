@@ -6,7 +6,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 
 configurations {
-  testRuntime.extendsFrom shadow
+  testRuntimeOnly.extendsFrom shadow
 }
 
 dependencies {
@@ -15,7 +15,7 @@ dependencies {
   shadow group: 'org.ow2.asm', name: 'asm-tree', version: '9.6'
   shadow group: 'org.ow2.asm', name: 'asm', version: '9.6'
   shadow group: 'org.ow2.asm', name: 'asm-analysis', version: '9.6'
-  testCompile group: 'org.testng', name: 'testng', version: '7.3.0'
+  testImplementation group: 'org.testng', name: 'testng', version: '7.9.0'
 }
 
 sourceSets.main.compileClasspath += configurations.shadow + sourceSets.main.compileClasspath
@@ -24,7 +24,7 @@ javadoc.classpath += configurations.shadow + sourceSets.main.compileClasspath
 
 shadowJar {
   configurations += [project.configurations.shadow]
-  classifier = null
+  archiveClassifier = ''
   relocate 'org.objectweb', 'parseq.org.objectweb'
   relocate 'net.bytebuddy', 'parseq.net.bytebuddy'
 }

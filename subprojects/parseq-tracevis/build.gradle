@@ -275,8 +275,8 @@ task buildLint(type: Exec) {
 
 // package the tar.gz for maven publishing
 task makeDist(type: Tar, dependsOn:['makeBuild', 'makeTest']) {
-  extension = 'tar.gz'
-  baseName = 'parseq-tracevis'
+  archiveExtension = 'tar.gz'
+  archiveBaseName = 'parseq-tracevis'
   compression = Compression.GZIP
   from "${projectDir}/build/tracevis"
   into "tracevis"

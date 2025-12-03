@@ -7,8 +7,8 @@ ext {
 
 
 dependencies {
-  compile group: 'org.apache.zookeeper', name: 'zookeeper', version:'3.4.6'
-  testCompile project(':parseq-test-api')
-  testCompile group: 'org.testng', name: 'testng', version:'6.9.9'
-  testCompile group: 'com.linkedin.pegasus', name: 'd2', version:'2.6.0'
+  api group: 'org.apache.zookeeper', name: 'zookeeper', version:'3.4.6'
+  testImplementation project(':parseq-test-api')
+  testImplementation group: 'org.testng', name: 'testng', version:'7.9.0'
+  testImplementation group: 'com.linkedin.pegasus', name: 'd2', version:'2.6.0'
 }

@@ -4,9 +4,9 @@ ext {
 
 
 dependencies {
-  compile group: 'org.hdrhistogram', name: 'HdrHistogram', version:'2.1.8'
+  api group: 'org.hdrhistogram', name: 'HdrHistogram', version:'2.1.8'
 
-  testCompile project(':parseq-test-api')
-  testCompile group: 'org.testng', name: 'testng', version:'6.9.9'
-  testCompile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.12'
+  testImplementation project(':parseq-test-api')
+  testImplementation group: 'org.testng', name: 'testng', version:'7.9.0'
+  testImplementation group: 'org.slf4j', name: 'slf4j-simple', version:'2.0.9'
 }

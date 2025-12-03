@@ -259,8 +259,9 @@ public class Engine {
               (Class<? extends TaskQueue>) Thread.currentThread().getContextClassLoader().loadClass(className);
           return () -> {
             try {
-              return clazz.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+              return clazz.getDeclaredConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                     java.lang.reflect.InvocationTargetException e) {
               return new LIFOBiPriorityQueue();
             }
           };

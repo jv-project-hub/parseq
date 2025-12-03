@@ -327,7 +327,6 @@ public abstract class AbstractTaskTest extends BaseEngineTest {
     logTracingResults("AbstractTaskTest.testWithSideEffectCancel", mainTasks);
   }
 
-  @Test
   public void testWithSideEffectFailure(int expectedNumberOfTasks) throws Exception {
     Task<String> failureMain = getFailureTask();
     Task<String> fastSideEffect = getSuccessTask();

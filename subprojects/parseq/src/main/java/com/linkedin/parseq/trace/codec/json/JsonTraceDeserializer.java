@@ -23,7 +23,7 @@ import com.linkedin.parseq.trace.ShallowTraceBuilder;
 import com.linkedin.parseq.trace.Trace;
 import com.linkedin.parseq.trace.TraceRelationship;
 
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -120,25 +120,25 @@ class JsonTraceDeserializer {
   }
 
   private static boolean getBooleanField(final JsonNode node, final String fieldName) throws IOException {
-    return getField(node, fieldName).getBooleanValue();
+    return getField(node, fieldName).booleanValue();
   }
 
   private static int getIntField(final JsonNode node, final String fieldName) throws IOException {
-    return getField(node, fieldName).getIntValue();
+    return getField(node, fieldName).intValue();
   }
 
   private static long getLongField(final JsonNode node, final String fieldName) throws IOException {
-    return getField(node, fieldName).getLongValue();
+    return getField(node, fieldName).longValue();
   }
 
   private static String getTextField(final JsonNode node, final String fieldName) throws IOException {
-    return getField(node, fieldName).getTextValue();
+    return getField(node, fieldName).textValue();
   }
 
   private static JsonNode getField(final JsonNode node, final String fieldName) throws IOException {
     final JsonNode field = node.get(fieldName);
     if (field == null) {
-      throw new IOException("Missing field: '" + fieldName + "' in " + node.getValueAsText());
+      throw new IOException("Missing field: '" + fieldName + "' in " + node.asText());
     }
     return field;
   }

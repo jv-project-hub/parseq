@@ -1,12 +1,13 @@
 package com.linkedin.parseq.internal;
 
-import junit.framework.Assert;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -35,14 +36,14 @@ public class TestCachedLoggerFactory {
           cachedFactory.getLogger("com.linkedin.parseq.Task");
           stopRace.countDown();
         } catch (Exception e) {
-          Assert.fail();
+          fail();
         }
       } );
     }
     // start race
     startRace.countDown();
     assertTrue(stopRace.await(5000, TimeUnit.MILLISECONDS));
-    Assert.assertEquals(loggerFactory.getCount(), 1);
+    assertEquals(loggerFactory.getCount(), 1);
   }
 
   private static class CountingLoggerFactory implements ILoggerFactory {

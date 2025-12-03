@@ -3,15 +3,15 @@ ext {
 }
 
 dependencies {
-  compile project(':parseq-batching')
-  compile group: 'org.hdrhistogram', name: 'HdrHistogram', version:'2.1.8'
-  compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.12'
+  implementation project(':parseq-batching')
+  implementation group: 'org.hdrhistogram', name: 'HdrHistogram', version:'2.1.8'
+  implementation group: 'org.slf4j', name: 'slf4j-simple', version:'2.0.9'
 }
 
 task fatJar(type: Jar) {
   mustRunAfter ':parseq:jar' // for some reason, gradle can't figure out this transitive dependency
-  classifier = 'jar-with-dependencies'
-  from { configurations.compile.collect { it.isDirectory()? it : zipTree(it) } }
+  archiveClassifier = 'jar-with-dependencies'
+  from { configurations.runtimeClasspath.collect { it.isDirectory()? it : zipTree(it) } }
   with jar
   manifest {
     attributes("Created-By": "Gradle",

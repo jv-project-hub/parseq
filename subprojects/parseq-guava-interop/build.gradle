@@ -3,9 +3,9 @@ ext {
 }
 
 dependencies {
-  compile project(":parseq")
-  compile "com.google.guava:guava:30.1.1-jre"
+  api project(":parseq")
+  api "com.google.guava:guava:32.1.3-jre"
 
-  testCompile project(':parseq-test-api')
-  testCompile "org.testng:testng:6.9.9"
+  testImplementation project(':parseq-test-api')
+  testImplementation "org.testng:testng:7.9.0"
 }

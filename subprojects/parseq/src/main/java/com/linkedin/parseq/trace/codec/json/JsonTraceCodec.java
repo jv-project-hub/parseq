@@ -18,11 +18,11 @@ package com.linkedin.parseq.trace.codec.json;
 
 import com.linkedin.parseq.trace.Trace;
 import com.linkedin.parseq.trace.codec.TraceCodec;
-import org.codehaus.jackson.JsonEncoding;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -71,7 +71,7 @@ public class JsonTraceCodec implements TraceCodec {
 
   @Override
   public Trace decode(InputStream inputStream) throws IOException {
-    final JsonParser parser = OBJECT_MAPPER.getJsonFactory().createJsonParser(inputStream);
+    final JsonParser parser = OBJECT_MAPPER.getFactory().createParser(inputStream);
     final JsonNode rootNode = OBJECT_MAPPER.readTree(parser);
     return JsonTraceDeserializer.deserialize(rootNode);
   }
@@ -83,7 +83,7 @@ public class JsonTraceCodec implements TraceCodec {
 
   @Override
   public void encode(Trace trace, OutputStream outputStream) throws IOException {
-    final JsonGenerator generator = OBJECT_MAPPER.getJsonFactory().createJsonGenerator(outputStream, JsonEncoding.UTF8);
+    final JsonGenerator generator = OBJECT_MAPPER.getFactory().createGenerator(outputStream, JsonEncoding.UTF8);
     JsonTraceSerializer.serialize(trace, generator);
     generator.flush();
   }

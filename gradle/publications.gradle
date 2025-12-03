@@ -105,10 +105,6 @@ task assertArtifactsExist() {
   }
 }
 
-// TODO: remove once ivy publications are no longer required
-// Publish to project's local ivy repo
-uploadArchives {
-  repositories {
-    ivy { url "file:$rootDir/build/ivy-repo" }
-  }
-}
+// Note: uploadArchives was removed as part of Gradle 8.x upgrade
+// The 'maven' plugin is no longer available; use 'maven-publish' instead
+// Use './gradlew publishToMavenLocal' for local publishing

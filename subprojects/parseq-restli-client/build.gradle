@@ -6,23 +6,23 @@ apply plugin: 'antlr'
 
 
 dependencies {
-    compile project(":parseq-batching")
-    compile group: 'com.linkedin.pegasus', name: 'pegasus-common', version:'24.0.2'
-    compile group: 'com.linkedin.pegasus', name: 'restli-common', version:'24.0.2'
-    compile group: 'com.linkedin.pegasus', name: 'restli-client', version:'24.0.2'
-    compile group: 'com.linkedin.pegasus', name: 'r2-core', version:'24.0.2'
-    compile group: 'org.hdrhistogram', name: 'HdrHistogram', version:'2.1.8'
-    compile group: 'org.antlr', name: 'antlr4-runtime', version:'4.5'
+    api project(":parseq-batching")
+    api group: 'com.linkedin.pegasus', name: 'pegasus-common', version:'24.0.2'
+    api group: 'com.linkedin.pegasus', name: 'restli-common', version:'24.0.2'
+    api group: 'com.linkedin.pegasus', name: 'restli-client', version:'24.0.2'
+    api group: 'com.linkedin.pegasus', name: 'r2-core', version:'24.0.2'
+    api group: 'org.hdrhistogram', name: 'HdrHistogram', version:'2.1.8'
+    api group: 'org.antlr', name: 'antlr4-runtime', version:'4.5'
 
-    testCompile project(':parseq-test-api')
-    testCompile group: 'org.testng', name: 'testng', version:'6.9.9'
-    testCompile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.12'
-    testCompile (group: 'com.linkedin.pegasus', name: 'restli-int-test-server', version:'24.0.2'){
+    testImplementation project(':parseq-test-api')
+    testImplementation group: 'org.testng', name: 'testng', version:'7.9.0'
+    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version:'2.0.9'
+    testImplementation (group: 'com.linkedin.pegasus', name: 'restli-int-test-server', version:'24.0.2'){
         //excluding a particular transitive dependency since we want to use the module with 'all' classifier one below
         exclude group: 'com.linkedin.pegasus', module: 'restli-int-test-api'
     }
-    testCompile group: 'com.linkedin.pegasus', name: 'restli-int-test-api', version:'24.0.2', classifier:'all'
-    testCompile group: 'com.linkedin.pegasus', name: 'r2-netty', version:'24.0.2'
+    testImplementation group: 'com.linkedin.pegasus', name: 'restli-int-test-api', version:'24.0.2', classifier:'all'
+    testImplementation group: 'com.linkedin.pegasus', name: 'r2-netty', version:'24.0.2'
 
     antlr "org.antlr:antlr4:4.5"
 }

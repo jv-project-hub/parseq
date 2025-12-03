@@ -9,21 +9,21 @@ configurations {
 }
 
 dependencies {
-  compile project(":parseq-exec")
-  compile project(":parseq-http-client")
+  implementation project(":parseq-exec")
+  implementation project(":parseq-http-client")
 
-  compile project(path: ':parseq-tracevis', configuration: 'tracevisArtifacts')
+  implementation project(path: ':parseq-tracevis', configuration: 'tracevisArtifacts')
   // If you didn't change any code in tracevis module, you can use below dependencies to build current module
-  // compile group: 'com.linkedin.parseq', name: 'parseq-tracevis', version: version, ext: 'tar.gz'
-  compile group: 'org.eclipse.jetty', name: 'jetty-server', version: jettyVersion
-  compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: jettyVersion
-  compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.12'
+  // implementation group: 'com.linkedin.parseq', name: 'parseq-tracevis', version: version, ext: 'tar.gz'
+  implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: jettyVersion
+  implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: jettyVersion
+  implementation group: 'org.slf4j', name: 'slf4j-simple', version:'2.0.9'
 }
 
 
 task fatJar(type: Jar, dependsOn: ':parseq-tracevis:makeDist') {
-  classifier = 'jar-with-dependencies'
-  from configurations.compile.collect {
+  archiveClassifier = 'jar-with-dependencies'
+  from configurations.runtimeClasspath.collect {
     if (it.isDirectory()) {
       it
     } else if (it.name.endsWith('tar.gz')){
