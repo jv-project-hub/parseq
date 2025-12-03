@@ -5,8 +5,8 @@ buildscript {
     }
   }
   dependencies {
-    classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.32.0'
-    classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:5.2.0'
+    classpath 'com.gradleup.shadow:shadow-gradle-plugin:8.3.0'
   }
 }
 
@@ -16,7 +16,6 @@ allprojects { // for all projects including the root project
   apply plugin: 'idea'
   apply plugin: 'eclipse'
   apply plugin: 'maven-publish'
-  apply plugin: 'maven'
   // TODO: remove this once we no longer need ivy publications (adds the "signatures" .ivy configuration)
   apply plugin: 'signing'
 
@@ -30,8 +29,8 @@ allprojects { // for all projects including the root project
 
 idea {
   project {
-    jdkName = '1.8.0_121'
-    languageLevel = '1.8'
+    jdkName = '21'
+    languageLevel = '21'
   }
 }
 
@@ -39,8 +38,8 @@ subprojects {
   if (!it.name.equals("parseq-tracevis")) {
     apply plugin: 'java'
     apply plugin: 'java-library'
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 21
+    targetCompatibility = 21
 
     test {
       useTestNG()
@@ -48,19 +47,19 @@ subprojects {
 
     if (it.name.startsWith('parseq-') && !it.name.equals("parseq-lambda-names")) { // all contrib modules
       dependencies {
-        compile project(":parseq")
+        api project(":parseq")
       }
     }
 
     // package jar
     task packageJavadoc(type: Jar, dependsOn: 'javadoc') {
       from javadoc.destinationDir
-      classifier = 'javadoc'
+      archiveClassifier = 'javadoc'
     }
 
     task packageSources(type: Jar, dependsOn: 'classes') {
       from sourceSets.main.allSource
-      classifier = 'sources'
+      archiveClassifier = 'sources'
     }
 
     // configure MANIFEST
@@ -75,21 +74,19 @@ subprojects {
 
 
     javadoc {
-      options.source = "8"
+      options.source = "21"
       options.use = true
       options.author = true
       // TODO: update date to be dynamically set
       options.bottom = "Copyright &#169; 2018. All rights reserved."
       options.classpath += file("${project.projectDir.absolutePath}/src/main/java")
-      options.links("https://docs.oracle.com/javase/8/docs/api/")
+      options.links("https://docs.oracle.com/en/java/javase/21/docs/api/")
       options.addStringOption("charset", "UTF-8")
     }
 
-    if (JavaVersion.current().isJava8Compatible()) {
-      allprojects {
-        tasks.withType(Javadoc) {
-          options.addStringOption('Xdoclint:none', '-quiet')
-        }
+    allprojects {
+      tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
       }
     }
   }
@@ -150,9 +147,4 @@ subprojects { p ->
   }
 }
 
-// TODO: remove once ivy publications are no longer required
-// Clean the project's local ivy repo before publishing to prevent conflicts
-project.tasks.uploadArchives.doFirst {
-  logger.lifecycle "Cleaning local ivy repo: $rootDir/build/ivy-repo"
-  delete(file("$rootDir/build/ivy-repo"))
-}
+// Legacy uploadArchives removed - using maven-publish instead

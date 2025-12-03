@@ -31,15 +31,15 @@ configurations {
 }
 
 dependencies {
-  compile group: "com.google.guava", name:"guava", version: "30.1.1-jre"
-  compile group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.8.8'
-  compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.8.8'
-  compile group: "org.slf4j", name: "slf4j-api", version: "1.7.25"
+  api group: "com.google.guava", name:"guava", version: "30.1.1-jre"
+  api group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.8.8'
+  api group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.8.8'
+  api group: "org.slf4j", name: "slf4j-api", version: "1.7.25"
   bootstrap group: "net.sourceforge.fmpp", name: "fmpp", version: "0.9.15"
 
-  testCompile project(':parseq-test-api')
-  testCompile group: "org.testng", name: "testng", version: "6.9.9"
-  testCompile group: "org.slf4j", name: "slf4j-log4j12", version: "1.7.25"
+  testImplementation project(':parseq-test-api')
+  testImplementation group: "org.testng", name: "testng", version: "6.9.9"
+  testImplementation group: "org.slf4j", name: "slf4j-log4j12", version: "1.7.25"
 
   // TODO: remove in parseq 5
   testArtifact project(':parseq-test-api')

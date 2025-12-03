@@ -10,7 +10,7 @@ ext {
 dependencies {
     rootProject.subprojects.forEach {
         if (it != project && !it.name.endsWith('examples')) {
-            compile it
+            api it
         }
     }
 }

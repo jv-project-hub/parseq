@@ -3,15 +3,15 @@ ext {
 }
 
 dependencies {
-  compile project(':parseq-batching')
-  compile group: 'org.hdrhistogram', name: 'HdrHistogram', version:'2.1.8'
-  compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.12'
+  implementation project(':parseq-batching')
+  implementation group: 'org.hdrhistogram', name: 'HdrHistogram', version:'2.1.8'
+  implementation group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.12'
 }
 
 task fatJar(type: Jar) {
-  mustRunAfter ':parseq:jar' // for some reason, gradle can't figure out this transitive dependency
-  classifier = 'jar-with-dependencies'
-  from { configurations.compile.collect { it.isDirectory()? it : zipTree(it) } }
+  dependsOn ':parseq:jar', ':parseq-batching:jar'
+  archiveClassifier = 'jar-with-dependencies'
+  from { configurations.runtimeClasspath.collect { it.isDirectory()? it : zipTree(it) } }
   with jar
   manifest {
     attributes("Created-By": "Gradle",
@@ -19,10 +19,11 @@ task fatJar(type: Jar) {
         "Build-JDK": JavaVersion.current())
     attributes 'Main-Class': 'com.linkedin.parseq.PerfLarge'
   }
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 task executeJava(type: JavaExec) {
-  main = "com.linkedin.parseq.PerfLarge"
+  mainClass = "com.linkedin.parseq.PerfLarge"
   classpath = sourceSets.main.runtimeClasspath
 }
 

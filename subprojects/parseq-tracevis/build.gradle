@@ -36,7 +36,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath 'com.github.node-gradle:gradle-node-plugin:2.2.3'
+    classpath 'com.github.node-gradle:gradle-node-plugin:7.0.1'
   }
 }
 
@@ -212,7 +212,7 @@ task testIntCov(type: NodeTask, dependsOn: 'buildInstrumentationModule'){
   }
 }
 
-task buildInstrumentationLib(type: NodeTask) {
+task buildInstrumentationLib(type: NodeTask, dependsOn: 'node_modules') {
   doFirst {
     delete "${projectDir}/build/instrumentation/lib"
   }
@@ -247,6 +247,8 @@ task buildInstrumentationModule(type: Copy, dependsOn: ['buildTracevis', 'buildI
     delete folder
   }
 
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
   from("build/tracevis") {
     include '*'
     include '**/*'
@@ -275,8 +277,8 @@ task buildLint(type: Exec) {
 
 // package the tar.gz for maven publishing
 task makeDist(type: Tar, dependsOn:['makeBuild', 'makeTest']) {
-  extension = 'tar.gz'
-  baseName = 'parseq-tracevis'
+  archiveExtension = 'tar.gz'
+  archiveBaseName = 'parseq-tracevis'
   compression = Compression.GZIP
   from "${projectDir}/build/tracevis"
   into "tracevis"
