@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 
-import javax.xml.bind.DatatypeConverter;
+import java.util.Base64;
 
 import com.linkedin.parseq.HistogramSerializer;
 
@@ -26,13 +26,13 @@ public class Base64CompressedHistogramSerializer implements HistogramSerializer 
     targetBuffer.putLong(compressedLength, histogram.getStartTimeStamp());
     targetBuffer.putLong(compressedLength + Long.BYTES, histogram.getEndTimeStamp());
     byte[] compressedArray = Arrays.copyOf(targetBuffer.array(), compressedLength + (2 * Long.BYTES));
-    return DatatypeConverter.printBase64Binary(compressedArray);
+    return Base64.getEncoder().encodeToString(compressedArray);
   }
 
   @Override
   public Histogram deserialize(String serialized) {
     try {
-      byte[] rawBytes = DatatypeConverter.parseBase64Binary(serialized);
+      byte[] rawBytes = Base64.getDecoder().decode(serialized);
       final ByteBuffer buffer = ByteBuffer.wrap(rawBytes, 0, rawBytes.length - (2 * Long.BYTES));
       Histogram histogram = (Histogram) EncodableHistogram.decodeFromCompressedByteBuffer(buffer, 0);
       final ByteBuffer timestamps = ByteBuffer.wrap(rawBytes, 0, rawBytes.length);

@@ -9,8 +9,9 @@ dependencies {
 }
 
 task fatJar(type: Jar) {
-  mustRunAfter ':parseq:jar' // for some reason, gradle can't figure out this transitive dependency
+  dependsOn ':parseq:jar', ':parseq-batching:jar'
   archiveClassifier = 'jar-with-dependencies'
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
   from { configurations.runtimeClasspath.collect { it.isDirectory()? it : zipTree(it) } }
   with jar
   manifest {

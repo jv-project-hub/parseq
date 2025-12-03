@@ -142,6 +142,26 @@ This document tracks all changes made during the Java 17 upgrade of the `subproj
 - **Issue**: TestNG 7.x tries to inject parameters into `@Test` methods
 - **Fix**: Removed `@Test` annotation from parameterized method `testWithSideEffectFailure(int)`
 
+### Fix 4: JAXB DatatypeConverter Removed in Java 11+
+- **Status**: COMPLETED
+- **File**: `subprojects/parseq-benchmark/src/main/java/org/HdrHistogram/Base64CompressedHistogramSerializer.java`
+- **Issue**: `javax.xml.bind.DatatypeConverter` was part of Java EE (JAXB) and was removed in Java 11
+- **Fix**: Replaced with `java.util.Base64` (available since Java 8)
+  - `DatatypeConverter.printBase64Binary(bytes)` -> `Base64.getEncoder().encodeToString(bytes)`
+  - `DatatypeConverter.parseBase64Binary(str)` -> `Base64.getDecoder().decode(str)`
+
+### Fix 5: Gradle 8.x Task Dependency Issue
+- **Status**: COMPLETED
+- **File**: `subprojects/parseq-benchmark/build.gradle`
+- **Issue**: `fatJar` task had implicit dependency on `:parseq-batching:jar` not declared
+- **Fix**: Changed `mustRunAfter` to `dependsOn` for both `:parseq:jar` and `:parseq-batching:jar`
+
+### Fix 6: Gradle 8.x Duplicate Entry Strategy
+- **Status**: COMPLETED
+- **File**: `subprojects/parseq-benchmark/build.gradle`
+- **Issue**: `fatJar` task failed with "Entry META-INF/LICENSE is a duplicate but no duplicate handling strategy has been set"
+- **Fix**: Added `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` to the fatJar task
+
 ---
 
 ## Final Validation
